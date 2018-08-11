@@ -1,9 +1,9 @@
 package com.greenfoxacademy.auth.services;
 
 import com.greenfoxacademy.auth.models.ErrorMessage;
-import com.greenfoxacademy.auth.models.Role;
 import com.greenfoxacademy.auth.models.User;
 import com.greenfoxacademy.auth.repositories.UserRepository;
+import com.greenfoxacademy.auth.security.JwtTokenProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -13,17 +13,22 @@ import java.util.Collection;
 @Service
 public class RegisterRestServiceImpl implements RegisterRestService {
     private final UserRepository userRepository;
+    private final JwtTokenProvider jwtTokenProvider;
 
 
     @Autowired
-    public RegisterRestServiceImpl(UserRepository userRepository) {
+    public RegisterRestServiceImpl(UserRepository userRepository, JwtTokenProvider jwtTokenProvider) {
+
         this.userRepository = userRepository;
+        this.jwtTokenProvider =jwtTokenProvider;
     }
 
 
     @Override
-    public User createNewUser(String email, String password, Collection<Role> roles) {
-        User newUser = new User(email, password, roles, false);
+    public User createNewUser(String email, String password) {
+        User newUser = new User(email, password, false);
+        String token = jwtTokenProvider.createToken(email);
+        System.out.println(token);
         userRepository.save(newUser);
         return newUser;
     }

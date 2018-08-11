@@ -1,27 +1,20 @@
 package com.greenfoxacademy.auth.security;
 
 import com.greenfoxacademy.auth.exceptions.CustomException;
-import com.greenfoxacademy.auth.models.Role;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.JwtException;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
+;
 import java.util.Base64;
 import java.util.Date;
-import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
 
 @Component
 public class JwtTokenProvider {
@@ -44,10 +37,10 @@ public class JwtTokenProvider {
         secretKey = Base64.getEncoder().encodeToString(secretKey.getBytes());
     }
 
-    public String createToken(String email, List<Role> roles) {
+    public String createToken(String email) {
 
         Claims claims = Jwts.claims().setSubject(email);
-        claims.put("auth", roles.stream().map(r -> new Role(r.getName())));
+
 
         Date now = new Date();
         Date validity = new Date(now.getTime() + validityInMilliseconds);
@@ -56,7 +49,7 @@ public class JwtTokenProvider {
                 .setClaims(claims)//
                 .setIssuedAt(now)//
                 .setExpiration(validity)//
-                .signWith(SignatureAlgorithm.HS512, secretKey)//
+                .signWith(SignatureAlgorithm.HS256, secretKey)//
                 .compact();
     }
 
@@ -85,5 +78,36 @@ public class JwtTokenProvider {
             throw new CustomException("Expired or invalid JWT token", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+//    private String createJWT(String id, String issuer, String subject, long ttlMillis) {
+//
+//        //The JWT signature algorithm we will be using to sign the token
+//        SignatureAlgorithm signatureAlgorithm = SignatureAlgorithm.HS256;
+//
+//        long nowMillis = System.currentTimeMillis();
+//        Date now = new Date(nowMillis);
+//
+//        //We will sign our JWT with our ApiKey secret
+//        byte[] apiKeySecretBytes = DatatypeConverter.parseBase64Binary(secretKey);
+//        Key signingKey = new SecretKeySpec(apiKeySecretBytes, signatureAlgorithm.getJcaName());
+//
+//        //Let's set the JWT Claims
+//        JwtBuilder builder = Jwts.builder().setId(id)
+//                .setIssuedAt(now)
+//                .setSubject(subject)
+//                .setIssuer(issuer)
+//                .signWith(signatureAlgorithm, signingKey);
+//
+//        //if it has been specified, let's add the expiration
+//        if (ttlMillis >= 0) {
+//            long expMillis = nowMillis + ttlMillis;
+//            Date exp = new Date(expMillis);
+//            builder.setExpiration(exp);
+//        }
+//
+//        //Builds the JWT and serializes it to a compact, URL-safe string
+//        return builder.compact();
+//    }
+
 
 }

@@ -43,7 +43,7 @@ public class RegisterRestController extends ResponseEntityExceptionHandler {
             ErrorMessage weakPasswordUser = registerRestService.weakPassword();
             return new ResponseEntity<>(weakPasswordUser, HttpStatus.BAD_REQUEST);
         } else {
-            User newUser = registerRestService.createNewUser(user.getEmail(), user.getPassword(), user.getRoles());
+            User newUser = registerRestService.createNewUser(user.getEmail(), user.getPassword());
             return new ResponseEntity<>(newUser, HttpStatus.CREATED);
         }
     }

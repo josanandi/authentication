@@ -10,6 +10,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 @ComponentScan({"com.greenfoxacademy.auth"})
 @EntityScan("com.greenfoxacademy.auth.models")
 @EnableJpaRepositories("com.greenfoxacademy.auth.repositories")
+
 public class AuthApplication {
 
     public static void main(String[] args) {
